@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 
 function Book() {
   const ae = localStorage.getItem("a_email");
-  var navigate = useNavigate();
+  const navigate = useNavigate();
 
   const [obj, updateobj] = useState({
     aemail: ae,
@@ -25,13 +25,11 @@ function Book() {
 
   useEffect(() => {
     console.log("object:" + JSON.stringify(obj));
-
     fetchdetails();
   }, []);
 
   const update = (event) => {
-    var { name, value } = event.target;
-
+    const { name, value } = event.target;
     updateobj({ ...obj, [name]: value });
   };
 
@@ -39,14 +37,10 @@ function Book() {
     try {
       const url = `http://localhost:2002/provider/fetch-freespace-get?name=${ae}`;
       const result = await axios.get(url, {
-        validateStatus: (status) => {
-          // Accept all status codes for manual handling
-          return true;
-        },
+        validateStatus: (status) => true, // Handle all status codes manually
       });
 
       if (result.status === 200 && result.data.status) {
-        // Update the slot number in the state
         updateobj({ ...obj, slotno: result.data.slot.slotno });
       } else if (result.status === 404) {
         alert(result.data.message || "No free slots available");
@@ -63,16 +57,13 @@ function Book() {
   async function bookslot() {
     try {
       const url = "http://localhost:2002/provider/fillslot-post";
-      alert(JSON.stringify(obj));
-      const response = await axios.post(url, obj, {
-        validateStatus: (status) => {
-          // Accept all status codes for manual handling
-          return true;
-        },
+      const payload = { ...obj }; // Payload without payment response
+      alert(JSON.stringify(payload));
+      const response = await axios.post(url, payload, {
+        validateStatus: (status) => true, // Handle all status codes manually
       });
 
       if (response.status === 200 && response.data.status) {
-        // Notify the user and navigate to the dashboard
         alert(response.data.message || "Slot booked successfully");
         navigate("/pdash");
       } else if (response.status === 404) {
@@ -101,34 +92,22 @@ function Book() {
               <Form.Label>Name</Form.Label>
               <Form.Control
                 type="text"
-                aria-describedby="inputGroupPrepend"
-                required
                 placeholder="name"
                 name="name"
                 value={obj.name}
                 onChange={update}
-                // disabled
               />
-              <Form.Control.Feedback type="invalid">
-                Please choose a username.
-              </Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group as={Col} md="4" controlId="validationCustomUsername">
-              <Form.Label>email</Form.Label>
+              <Form.Label>Email</Form.Label>
               <Form.Control
                 type="text"
-                aria-describedby="inputGroupPrepend"
-                required
                 placeholder="email"
                 name="email"
                 value={obj.email}
                 onChange={update}
-                // disabled
               />
-              <Form.Control.Feedback type="invalid">
-                Please choose a username.
-              </Form.Control.Feedback>
             </Form.Group>
           </Row>
 
@@ -138,49 +117,37 @@ function Book() {
               <Form.Control
                 type="text"
                 placeholder="Number"
-                required
                 name="number"
                 value={obj.number}
                 onChange={update}
               />
-              <Form.Control.Feedback type="invalid">
-                Please provide a valid number.
-              </Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group as={Col} md="3" controlId="validationCustom03">
-              <Form.Label>License plate no</Form.Label>
+              <Form.Label>License Plate No</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="plateno"
-                required
+                placeholder="License Plate"
                 name="licenseplate"
                 value={obj.licenseplate}
                 onChange={update}
               />
-              <Form.Control.Feedback type="invalid">
-                Please provide a valid number.
-              </Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group as={Col} md="3" controlId="validationCustom03">
-              <Form.Label>model</Form.Label>
+              <Form.Label>Model</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="model"
-                required
+                placeholder="Model"
                 name="model"
                 value={obj.model}
                 onChange={update}
               />
-              <Form.Control.Feedback type="invalid">
-                Please provide a valid number.
-              </Form.Control.Feedback>
             </Form.Group>
           </Row>
 
           <Button type="button" onClick={bookslot}>
-            Book
+            Book Slot
           </Button>
         </Form>
       </Container>
