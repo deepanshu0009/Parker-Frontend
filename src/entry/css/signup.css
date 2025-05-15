@@ -1,0 +1,39 @@
+.form-control:focus,
+.form-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+}
+
+.form-control,
+.form-select {
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+#signup-container{
+  width: 85% !important;
+}
+
+#main-container{
+  padding-left: 7rem !important;
+}
+
+.form-control:hover,
+.form-select:hover {
+  border-color: #3b82f6;
+}
+
+.btn-primary:hover {
+  background-color: #2563eb !important;
+}
+
+.display-6 {
+  font-size: 2.5rem;
+  letter-spacing: -0.5px;
+}
+
+@media (max-width: 768px) {
+  .display-6 {
+    font-size: 2rem;
+  }
+}
