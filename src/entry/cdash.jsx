@@ -35,10 +35,6 @@ return(
                         <h3> Find Parking</h3>
                         </Link>
 
-                        <Link to="/csearch">
-                        <h3> fetch pro</h3>
-                        </Link>
-
                         <Link to="/">
                         <h3 onClick={logout}>Log Out</h3>
                         </Link>

@@ -63,60 +63,84 @@ const idpic=(event)=>{
   updateobj({...obj,["idpic"]:file,["idprev"]:URL.createObjectURL(file)});
 }
 
-    async function savepost(){
-        var url="http://localhost:2002/client/saveprofile-client-post";
-    var formData=new FormData();
-    for(var x in obj)
-      {
-        formData.append(x,obj[x]);
-      }
-    var response = await axios.post(url,formData,{headers:{'Content-Type':'multipart/form-data'}} );
-    alert(JSON.stringify(response.data));
-    if(response.data.status)
-    {
-      navigate("/cdash");
-    }
-        
-    }
+async function savepost() {
+    try {
+        const url = "http://localhost:2002/client/saveprofile-client-post";
+        const formData = new FormData();
+        for (const key in obj) {
+            formData.append(key, obj[key]);
+        }
 
-    async function fetchdetails(){
-      console.log("email:"+obj.email);
-      var url="http://localhost:2002/client/fetch-client-get?email="+obj.email;
-      var result= await axios.get(url);
+        const response = await axios.post(url, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
 
-      if(result.data.status)
-      {
-        var p= "http://localhost:2002/uploads/"+result.data.user.ppic;
-        var i= "http://localhost:2002/uploads/"+result.data.user.idpic;
-        result.data.user.pprev = p;
-        result.data.user.idprev = i;
-        alert(result.data.user);
-        updateobj(result.data.user);
-        //updateobj({email:result.data.user.email,firstname:result.data.user.firstname,lastname:result.data.user.lastname,city:result.data.user.city,state:result.data.user.state,zip:result.data.user.zip,ppic:result.data.user.ppic,idpic:result.data.user.idpic,pprev:p,idprev:i});
-      }
-      else
-      {
-        st(true);
-      }  
+        if (response.status === 201) { // Check for status 201
+            alert(response.data.message || "User information saved successfully");
+            navigate("/cdash");
+        } else {
+            alert(response.data.error || "Failed to save user information");
+        }
+    } catch (err) {
+        console.error("Error saving user information:", err.response?.data || err.message);
+        alert("An error occurred while saving user information. Please try again.");
     }
+}
 
-    async function updatedetails(){
-      var url="http://localhost:2002/client/updateprofile-client-post";
-    var formData=new FormData();
-    for(var x in obj)
-      {
-        formData.append(x,obj[x]);
-      }
-    var response = await axios.post(url,formData,{headers:{'Content-Type':'multipart/form-data'}} );
-    if(response.data.status)
-    {
-      navigate("/cdash");
-    } 
-    else
-    {
-      alert(response.data.message);
+async function fetchdetails() {
+    try {
+        console.log("Fetching details for email:", obj.email);
+        const url = `http://localhost:2002/client/fetch-client-get?email=${obj.email}`;
+        const result = await axios.get(url, {
+            validateStatus: (status) => {
+                // Accept all status codes for manual handling
+                return true;
+            },
+        });
+
+        if (result.status === 200 && result.data.status) { // Check for status 200
+            const user = result.data.user;
+            const p = `http://localhost:2002/uploads/${user.ppic}`;
+            const i = `http://localhost:2002/uploads/${user.idpic}`;
+            user.pprev = p;
+            user.idprev = i;
+            updateobj(user);
+        } else if (result.status === 404) {
+            st(true); // Show save button if user not found
+        } else {
+            alert(result.data.message || "Failed to fetch user details");
+        }
+    } catch (err) {
+        console.error("Error fetching user details:", err.response?.data || err.message);
+        alert("An error occurred while fetching user details. Please try again.");
     }
-  }
+}
+
+async function updatedetails() {
+    try {
+        const url = "http://localhost:2002/client/updateprofile-client-post";
+        const formData = new FormData();
+        for (const key in obj) {
+            formData.append(key, obj[key]);
+        }
+
+        const response = await axios.post(url, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
+
+        if (response.status === 200 && response.data.status) { // Check for status 200
+            alert(response.data.message || "User information updated successfully");
+            navigate("/cdash");
+        } else if (response.status === 404) {
+            alert(response.data.message || "User not found");
+        } else {
+            alert(response.data.message || "Failed to update user information");
+        }
+    } catch (err) {
+        console.error("Error updating user information:", err.response?.data || err.message);
+        alert("An error occurred while updating user information. Please try again.");
+    }
+}
 
   return (
     <div>
@@ -139,6 +163,7 @@ const idpic=(event)=>{
               value={obj.email}
               onChange={update}
               // disabled
+              readOnly
             />
             <Form.Control.Feedback type="invalid">
               Please choose a username.
