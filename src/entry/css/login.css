@@ -1,0 +1,45 @@
+#main-container{
+    padding-left: 7rem !important;
+}
+
+#login-container{
+    width: 85% !important;
+}
+.form-control:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+}
+
+.form-control {
+    border: 1px solid #e5e7eb;
+    transition: all 0.2s ease;
+}
+
+.form-control:hover {
+    border-color: #3b82f6;
+}
+
+.btn-primary:hover {
+    background-color: #2563eb !important;
+}
+
+.display-6 {
+    font-size: 2.5rem;
+    letter-spacing: -0.5px;
+}
+
+@media (max-width: 768px) {
+    .display-6 {
+        font-size: 2rem;
+    }
+}
+
+.form-check-input:checked {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+}
+
+.form-check-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+}

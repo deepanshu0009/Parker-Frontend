@@ -1,23 +1,18 @@
 import React,{useState} from "react";
-import Button from 'react-bootstrap/Button';
-import Col from 'react-bootstrap/Col';
-import Form from 'react-bootstrap/Form';
-import Row from 'react-bootstrap/Row';
+import { Container, Form, Button, Row, Col } from "react-bootstrap"
 import axios from "axios";
-import Main from "./main";
 import { Link, useNavigate } from "react-router-dom";
-import { signupservice } from "../services/user";
-import Signnav from "./signnav";
-import email from "../images/email.png";
 import signup from "../images/signup-image.jpg";
-import key from "../images/key.png";
-
+import { Mail, Lock, ChevronDown } from "lucide-react"
+import Header from "./signnav.jsx";
+import "./css/signup.css";
 
 function Sign(){
 
   const [obj,updateobj]=useState({email:"",pwd:"",con_pwd:"",type:"type"});
 
   const nagivate=useNavigate();
+  
   const update=(event)=>{
       var {name,value}=event.target;
 
@@ -54,57 +49,128 @@ function Sign(){
     }
 };
 
-    return(
-        <div>
-          
-          <Signnav></Signnav>
+    return (
+    <div className="min-vh-100 d-flex flex-column bg-light">
+      <Header />
+      <Container id="main-container" className="flex-grow-1 d-flex align-items-center py-5">
+        <Row id="signup-container" className="justify-content-between align-items-center shadow-sm">
+          <Col md={5}>
+            <div className="bg-white rounded-3 p-4 p-md-5">
+              <h1 className="display-6 fw-bold mb-4">Sign up</h1>
+              <Form onSubmit={signupuser}>
+                <Form.Group className="mb-3 position-relative">
+                  <div
+                    className="position-absolute"
+                    style={{ top: "50%", left: "1rem", transform: "translateY(-50%)" }}
+                  >
+                    <Mail size={20} className="text-muted" />
+                  </div>
+                  <Form.Control
+                    type="email"
+                    name="email"
+                    placeholder="Your Email"
+                    value={obj.email}
+                    onChange={update}
+                    className="ps-5"
+                    style={{ height: "3rem" }}
+                    required
+                  />
+                </Form.Group>
 
-          <div><div >
+                <Form.Group className="mb-3 position-relative">
+                  <div
+                    className="position-absolute"
+                    style={{ top: "50%", left: "1rem", transform: "translateY(-50%)" }}
+                  >
+                    <Lock size={20} className="text-muted" />
+                  </div>
+                  <Form.Control
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+                    value={obj.pwd}
+                    onChange={update}
+                    className="ps-5"
+                    style={{ height: "3rem" }}
+                    required
+                  />
+                </Form.Group>
 
-<section >
-    <div >
-        <div >
-            <div>
-                <h2 >Sign up</h2>
-                <form method="POST"  id="register-form">
-                    
-                    <div>
-                        <label for="email">
-                        <img src={email} height="10px" width="10px" alt="" /></label>
-                        <input type="email" name="email" id="email" placeholder="Your Email" onChange={update}/>
+                <Form.Group className="mb-3 position-relative">
+                  <div
+                    className="position-absolute"
+                    style={{ top: "50%", left: "1rem", transform: "translateY(-50%)" }}
+                  >
+                    <Lock size={20} className="text-muted" />
+                  </div>
+                  <Form.Control
+                    type="password"
+                    name="confirmPassword"
+                    placeholder="Repeat your password"
+                    value={obj.con_pwd}
+                    onChange={update}
+                    className="ps-5"
+                    style={{ height: "3rem" }}
+                    required
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-4">
+                  <div className="position-relative">
+                    <Form.Select
+                      name="type"
+                      value={obj.type}
+                      onChange={update}
+                      className="ps-3"
+                      style={{ height: "3rem" }}
+                      required
+                    >
+                      <option value="">Signup as</option>
+                      <option value="car-owner">Car Owner</option>
+                      <option value="parking-provider">Parking Provider</option>
+                    </Form.Select>
+                    <div
+                      className="position-absolute"
+                      style={{ top: "50%", right: "1rem", transform: "translateY(-50%)" }}
+                    >
+                      <ChevronDown size={20} className="text-muted" />
                     </div>
-                    <div >
-                        <label for="pass">
-                        <img src={key} height="10px" width="10px" alt="" /></label>
-                        <input type="password" name="pwd" id="pass" placeholder="Password" onChange={update}/>
-                    </div>
-                    <div >
-                        <label for="re-pass">
-                        <img src={key} height="10px" width="10px" alt=""/></label>
-                        <input type="password" name="con_pwd" id="re_pass" placeholder="Repeat your password" onChange={update}/>
-                    </div>
-                    <div >
-                        <Form.Select type="select" name="type" id="name" placeholder="signup AS" onChange={update}>
-                        <option placeholder="signup AS">Signup as</option>
-                        <option value="Client">car-owner</option>
-                        <option value="Service-Provider">parking-Provider</option>
-                        </Form.Select>
-                    </div>
-                    
-                    <div >
-                        <input type="button" name="signup" id="signup"  onClick={signupuser} value="Register"/>
-                    </div>
-                </form>
+                  </div>
+                </Form.Group>
+
+                <Button
+                  type="submit"
+                  className="w-100 py-2"
+                  style={{
+                    backgroundColor: "#3B82F6",
+                    border: "none",
+                    height: "3rem",
+                  }}
+                >
+                  Register
+                </Button>
+
+                <div className="text-center mt-4">
+                  <Link to="/login" className="text-decoration-none text-muted">
+                    I am already member
+                  </Link>
+                </div>
+              </Form>
             </div>
-            
-        </div>
-    </div>
-</section>
-</div>
+          </Col>
 
-        </div>
-        </div>
-    )
+          <Col md={6} className="d-none d-md-block">
+            <img
+              src={signup}
+              alt="Workspace Illustration"
+              className="img-fluid"
+              style={{ maxHeight: "500px", objectFit: "contain" }}
+            />
+          </Col>
+        </Row>
+      </Container>
+    </div>
+  )
 }
 
 export default Sign;
