@@ -5,7 +5,7 @@ import Navbar from "./entry/main";
 import Signup from "./entry/signup";
 import Login from "./entry/login";
 import Pdash from "./owner/pdash";
-import Cdash from "./entry/cdash";
+import Cdash from "./client/cdash";
 import Welcome from "./owner/welcome";
 import Free from "./owner/freeslot";
 import Pprof from "./owner/providerprofile";
