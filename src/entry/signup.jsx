@@ -1,55 +1,46 @@
-import React,{useState} from "react";
-import { Container, Form, Button, Row, Col } from "react-bootstrap"
+import React, { useState } from "react";
+import { Container, Form, Button, Row, Col } from "react-bootstrap";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import signup from "../images/signup-image.jpg";
-import { Mail, Lock, ChevronDown } from "lucide-react"
+import { Mail, Lock, ChevronDown } from "lucide-react";
 import Header from "./signnav.jsx";
 import "./css/signup.css";
 
-function Sign(){
+function Sign() {
+  const [obj, updateobj] = useState({ email: "", pwd: "", con_pwd: "", type: "type" });
+  const navigate = useNavigate();
 
-  const [obj,updateobj]=useState({email:"",pwd:"",con_pwd:"",type:"type"});
+  const update = (event) => {
+    const { name, value } = event.target;
+    updateobj({ ...obj, [name]: value });
+  };
 
-  const nagivate=useNavigate();
-  
-  const update=(event)=>{
-      var {name,value}=event.target;
-
-      updateobj({...obj,[name]:value});
-  }
-
-  function check(){
-        if(obj.type==="type")
-        return false;
-        if(obj.email==="")
-        return false;
-        if(obj.pwd==="")
-        return false;
-  }
-
-  const signupuser = async () => {
-    console.log("Request Payload:", obj);
-    try {
-        const url = "http://localhost:2002/user/signup-user-post";
-        const resp = await axios.post(url, obj);
-
-        if (resp.status === 201) {
-            // Check for status 201
-            console.log("Signup successful");
-            alert("Signed up successfully");
-            nagivate("/"); // Navigate to the home page or desired route
-        } else {
-            console.log("Signup failed:", resp.data.message || "Unknown error");
-            alert(resp.data.message || "Signup failed. Please try again.");
-        }
-    } catch (error) {
-        console.error("Error during signup:", error.response?.data || error.message);
-        alert("An error occurred during signup. Please try again.");
+  const signupuser = async (e) => {
+    e.preventDefault();
+    if (!obj.email || !obj.pwd || !obj.con_pwd || obj.type === "type") {
+      alert("Please fill all fields and select a type.");
+      return;
     }
-};
+    if (obj.pwd !== obj.con_pwd) {
+      alert("Passwords do not match.");
+      return;
+    }
+    try {
+      const url = "http://localhost:2002/user/signup-user-post";
+      const resp = await axios.post(url, obj);
+      if (resp.status === 201) {
+        alert("Signed up successfully");
+        navigate("/"); // Corrected typo
+      } else {
+        alert(resp.data.message || "Signup failed. Please try again.");
+      }
+    } catch (error) {
+      alert("An error occurred during signup. Please try again.");
+    }
+  };
 
-    return (
+  return (
     <div className="min-vh-100 d-flex flex-column bg-light">
       <Header />
       <Container id="main-container" className="flex-grow-1 d-flex align-items-center py-5">
@@ -86,7 +77,7 @@ function Sign(){
                   </div>
                   <Form.Control
                     type="password"
-                    name="password"
+                    name="pwd"
                     placeholder="Password"
                     value={obj.pwd}
                     onChange={update}
@@ -105,7 +96,7 @@ function Sign(){
                   </div>
                   <Form.Control
                     type="password"
-                    name="confirmPassword"
+                    name="con_pwd"
                     placeholder="Repeat your password"
                     value={obj.con_pwd}
                     onChange={update}
@@ -125,7 +116,7 @@ function Sign(){
                       style={{ height: "3rem" }}
                       required
                     >
-                      <option value="">Signup as</option>
+                      <option value="type">Signup as</option>
                       <option value="car-owner">Car Owner</option>
                       <option value="parking-provider">Parking Provider</option>
                     </Form.Select>
@@ -170,7 +161,7 @@ function Sign(){
         </Row>
       </Container>
     </div>
-  )
+  );
 }
 
 export default Sign;

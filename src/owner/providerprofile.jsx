@@ -16,8 +16,7 @@ function Pprof() {
 
   useEffect(() => {
     console.log("object:" + JSON.stringify(obj));
-
-    // fetchdetails();
+    fetchdetails();
   }, [])
 
   const handleSubmit = (event) => {
@@ -30,26 +29,21 @@ function Pprof() {
       return;
     }
 
-
     setValidated(true);
     savepost();
   };
 
   const update = (event) => {
     var { name, value } = event.target;
-
     updateobj({ ...obj, [name]: value });
   }
 
   const pic = (event) => {
-    // alert(JSON.stringify(event.target));
-
     const file = event.target.files[0];
     updateobj({ ...obj, ["ppic"]: file, ["pprev"]: URL.createObjectURL(file) });
   }
 
   const idpic = (event) => {
-
     const file = event.target.files[0];
     updateobj({ ...obj, ["idpic"]: file, ["idprev"]: URL.createObjectURL(file) });
   }
@@ -64,12 +58,15 @@ function Pprof() {
 
       const response = await axios.post(url, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
+        validateStatus: (status) => {
+          // Accept all status codes for manual handling
+          return true;
+        },
       });
 
       if (response.status === 201) {
-        // Check for status 201
         alert(response.data.message || "Provider information saved successfully");
-        navigate("/pdash");
+        navigate("/pdash/");
       } else {
         alert(response.data.error || "Failed to save provider information");
       }
@@ -84,19 +81,13 @@ function Pprof() {
       console.log("Fetching details for email:", obj.email);
       const url = `http://localhost:2002/provider/fetch-provider-get?email=${obj.email}`;
       const result = await axios.get(url, {
-        validateStatus: (status) => {
-          // Accept all status codes for manual handling
-          return true;
-        },
+        validateStatus: (status) => true,
       });
 
       if (result.status === 200 && result.data.status) {
-        // Check for status 200
         const user = result.data.user;
-        const p = `http://localhost:2002/uploads/${user.ppic}`;
-        const i = `http://localhost:2002/uploads/${user.idpic}`;
-        user.pprev = p;
-        user.idprev = i;
+        user.pprev = user.ppic ? `http://localhost:2002/uploads/${user.ppic}` : "";
+        user.idprev = user.idpic ? `http://localhost:2002/uploads/${user.idpic}` : "";
         updateobj(user);
       } else if (result.status === 404) {
         st(true); // Show save button if provider not found
@@ -119,12 +110,15 @@ function Pprof() {
 
       const response = await axios.post(url, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
+        validateStatus: (status) => {
+          // Accept all status codes for manual handling
+          return true;
+        },
       });
 
       if (response.status === 200 && response.data.status) {
-        // Check for status 200
         alert(response.data.message || "Provider information updated successfully");
-        navigate("/pdash");
+        navigate("/pdash/");
       } else if (response.status === 404) {
         alert(response.data.message || "Provider not found");
       } else {

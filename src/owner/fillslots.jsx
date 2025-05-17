@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback, useRef } from "react"
-import { Container, Form, Button, Card, Row, Col } from "react-bootstrap"
-import { useNavigate } from "react-router-dom"
-import axios from "axios"
-import { User, Mail, Phone, CreditCard, Truck, Camera } from "lucide-react"
-import Webcam from "react-webcam"
+import { useRef, useState, useEffect, useCallback } from "react";
+import { Container, Form, Button, Card, Row, Col } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { User, Mail, Phone, CreditCard, Truck, Camera } from "lucide-react";
+import Webcam from "react-webcam";
 import "./css/fillslots.css";
 
 function Book() {
@@ -21,13 +21,20 @@ function Book() {
   });
 
   const [validated, setValidated] = useState(false);
-  const [capturedImage, setCapturedImage] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const webcamRef = useRef(null)
+  const [capturedImage, setCapturedImage] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const webcamRef = useRef(null);
+  const effectRan = useRef(false);
 
   useEffect(() => {
-    console.log("object:" + JSON.stringify(obj));
-    // fetchdetails();
+    if (effectRan.current === false) {
+      console.log("object:" + JSON.stringify(obj));
+      fetchdetails();
+      effectRan.current = true;
+    }
+    // Cleanup for React 18 StrictMode (optional, but safe)
+    return () => { effectRan.current = true; };
+    // eslint-disable-next-line
   }, []);
 
   const update = (event) => {
@@ -47,10 +54,10 @@ function Book() {
 
       if (result.status === 200 && result.data.status) {
         // Update the slot number in the state
-        updateobj({ ...obj, slotno: result.data.slot.slotno });
+        updateobj((prev) => ({ ...prev, slotno: result.data.slot.slotno }));
       } else if (result.status === 404) {
         alert(result.data.message || "No free slots available");
-        navigate("/pdash");
+        navigate("/pdash/");
       } else {
         alert(result.data.message || "Failed to fetch free slots");
       }
@@ -74,7 +81,7 @@ function Book() {
       if (response.status === 200 && response.data.status) {
         // Notify the user and navigate to the dashboard
         alert(response.data.message || "Slot booked successfully");
-        navigate("/pdash");
+        navigate("/pdash/");
       } else if (response.status === 404) {
         alert(response.data.message || "Slot not available or already booked");
       } else {
@@ -88,6 +95,11 @@ function Book() {
 
   const capture = useCallback(async () => {
     try {
+      if (!webcamRef.current) {
+        alert("Webcam not available");
+        return;
+      }
+
       const imageSrc = webcamRef.current.getScreenshot();
       if (imageSrc) {
         setCapturedImage(imageSrc);
@@ -95,7 +107,7 @@ function Book() {
 
         // Convert base64 to blob
         const base64Data = imageSrc.split(",")[1];
-        const blob = await fetch(`data:image/jpeg;base64,${base64Data}`).then(res => res.blob());
+        const blob = await fetch(`data:image/jpeg;base64,${base64Data}`).then((res) => res.blob());
 
         // Create FormData and append the blob
         const formData = new FormData();
@@ -116,7 +128,7 @@ function Book() {
 
           // Update licenseplate field with extracted text
           if (response.data && response.data.extracted_text) {
-            updateobj(prevObj => ({
+            updateobj((prevObj) => ({
               ...prevObj,
               licenseplate: response.data.extracted_text
             }));
@@ -141,6 +153,20 @@ function Book() {
     }
   }, [webcamRef]);
 
+  const handleSubmit = (event) => {
+    event.preventDefault(); // Prevent the default form submission
+
+    const form = document.querySelector("form");
+    if (form && !form.checkValidity()) {
+      setValidated(true);
+      return;
+    }
+    setValidated(true);
+
+    // If we reach here, the form is valid, we can proceed with booking the slot
+    bookslot();
+  };
+
   return (
     <Container className="py-4" style={{ maxWidth: "1200px" }}>
       <div className="text-center mb-5">
@@ -162,7 +188,7 @@ function Book() {
         <Col lg={8}>
           <Card className="border-0 shadow-sm">
             <Card.Body className="p-4">
-              <Form noValidate validated={validated}>
+              <Form noValidate validated={validated} onSubmit={handleSubmit}>
                 <Card className="mb-4 border-0">
                   <Card.Body className="p-4">
                     <h5 className="mb-4">Personal Information</h5>
@@ -209,6 +235,20 @@ function Book() {
                             value={obj.number}
                             onChange={update}
                             required
+                          />
+                        </Form.Group>
+                      </Col>
+                      <Col md={6}>
+                        <Form.Group controlId="slotno">
+                          <Form.Label>
+                            <CreditCard size={18} className="me-2" /> Slot Number
+                          </Form.Label>
+                          <Form.Control
+                            type="text"
+                            placeholder="Slot Number"
+                            name="slotno"
+                            value={obj.slotno}
+                            readOnly
                           />
                         </Form.Group>
                       </Col>
@@ -260,7 +300,7 @@ function Book() {
                 </Card>
 
                 <div className="d-flex justify-content-end align-items-center">
-                  <Button variant="primary" size="lg" className="px-5" onClick={bookslot}>
+                  <Button variant="primary" size="lg" className="px-5" type="submit">
                     Book Slot
                   </Button>
                 </div>

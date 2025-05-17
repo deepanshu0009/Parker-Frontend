@@ -30,7 +30,7 @@ function Park() {
   useEffect(() => {
     console.log("object:" + JSON.stringify(obj));
 
-    // fetchdetails();
+    fetchdetails();
   }, []);
 
   const handleSubmit = (event) => {
@@ -62,7 +62,7 @@ function Park() {
 
   async function savepost() {
     try {
-      const url = "http://localhost:2002/provider/saveparking-post";
+      const url = "http://localhost:2002/provider/save-parking-and-create-slots";
       const formData = new FormData();
 
       for (const key in obj) {
@@ -71,6 +71,7 @@ function Park() {
 
       const response = await axios.post(url, formData, {
         headers: { "Content-Type": "multipart/form-data" },
+        validateStatus: (status) => true, // Accept all status codes for manual handling
       });
 
       if (response.status === 201) {
@@ -100,7 +101,7 @@ function Park() {
       if (result.status === 200 && result.data.status) {
         // Check for status 200
         const parking = result.data.parking;
-        const p = `http://localhost:2002/uploads/${parking.ppic}`;
+        const p = parking.ppic ? `http://localhost:2002/uploads/${parking.ppic}` : "";
         parking.pprev = p;
         updateobj(parking);
       } else if (result.status === 404) {
@@ -125,6 +126,7 @@ function Park() {
 
       const response = await axios.post(url, formData, {
         headers: { "Content-Type": "multipart/form-data" },
+        validateStatus: (status) => true, // Accept all status codes for manual handling
       });
 
       if (response.status === 200 && response.data.status) {

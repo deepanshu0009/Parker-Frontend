@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Car, Hash } from 'lucide-react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import {initiatePayment} from "../payment/payment.jsx";
 import "./css/freeslot.css";
 
 function Free() {
@@ -22,13 +23,13 @@ function Free() {
 
     useEffect(() => {
         console.log("object:" + JSON.stringify(obj));
-        // fetchrate();
+         fetchrate();
     }, []);
 
     const fetchrate = async () => {
         try {
-            const url = `http://localhost:2002/provider/rate-post`;
-            const response = await axios.post(url, { email: obj.aemail }, {
+            const url = `http://localhost:2002/provider/rate-post?email=${obj.aemail}`; // Pass email as a query parameter
+            const response = await axios.get(url, {
                 validateStatus: (status) => {
                     // Accept all status codes for manual handling
                     return true;
@@ -37,7 +38,8 @@ function Free() {
 
             if (response.status === 200 && response.data.status) {
                 // Update the rate in the state
-                updatep(response.data.price);
+                updatep(response.data.rate); // Use `rate` from the backend response
+                // alert("Rate fetched successfully: " + JSON.stringify(response.data.rate));
             } else if (response.status === 404) {
                 alert(response.data.message || "Parking rate not found for the given email.");
             } else {
@@ -72,9 +74,10 @@ function Free() {
 
             if (response.status === 200 && response.data.status) {
                 // Calculate the bill
-                const bill = p * response.data.timeDifferenceInMinutes;
+                const bill = p * response.data.timeDifferenceInhours;
                 alert(`BILL = ${bill}`);
-                navigate("/pdash");
+                initiatePayment(bill);
+                navigate("/pdash/");
             } else if (response.status === 404) {
                 alert(response.data.message || "Slot not found.");
             } else {
@@ -84,6 +87,18 @@ function Free() {
             console.error("Error freeing slot:", err.response?.data || err.message);
             alert("An error occurred while freeing the slot. Please try again.");
         }
+    };
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        if (form.checkValidity() === false) {
+            event.stopPropagation();
+            setValidated(true);
+            return;
+        }
+        setValidated(true);
+        savepost();
     };
 
     return (
@@ -103,7 +118,7 @@ function Free() {
 
                 <Card className="border-0 form_container">
                     <Card.Body className="p-4">
-                        <Form noValidate validated={validated}>
+                        <Form noValidate validated={validated} onSubmit={handleSubmit}>
                             <Card className="mb-4 border-0 background_tint">
                                 <Card.Body className="p-4">
                                     <h5 className="mb-4">Slot Information</h5>
@@ -163,7 +178,7 @@ function Free() {
                                     variant="primary" 
                                     size="lg"
                                     className="px-5"
-                                    onClick={savepost}
+                                    type="submit"
                                 >
                                     Generate Bill
                                 </Button>

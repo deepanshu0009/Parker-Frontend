@@ -22,10 +22,6 @@ function Navmenu() {
             <Link to="/login">
               <Button className="Nav-btn" type="button">Login</Button>
             </Link>
-
-          </div>
-          <div>
-            Hello
           </div>
 
         </Container>
