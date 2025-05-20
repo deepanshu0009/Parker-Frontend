@@ -35,6 +35,10 @@ return(
                         <h3> Find Parking</h3>
                         </Link>
 
+                        <Link to="/fetchslots">
+                        <h3> Fetch Booked slot</h3>
+                        </Link>
+
                         <Link to="/">
                         <h3 onClick={logout}>Log Out</h3>
                         </Link>

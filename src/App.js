@@ -14,6 +14,7 @@ import Book from "./owner/fillslots";
 import ViewParking from "./owner/viewpark";
 import Cprof from "./client/clientprofile";
 import Fpark from "./client/fetchparking";
+import FetchAllClientBookedSlots from "./client/fetchallslots";
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
         <Route path="/cdash" element={<Cdash/>}></Route>
         <Route path="/cprof" element={<Cprof/>}></Route>
         <Route path="/cfpark" element={<Fpark/>}></Route>
+        <Route path="/fetchslots" element={<FetchAllClientBookedSlots/>}></Route>
     </Routes>
     </Router>
     
